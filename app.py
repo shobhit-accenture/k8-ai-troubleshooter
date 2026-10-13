@@ -40,6 +40,58 @@ def root():
         "status": "running"
     }
 
+@app.get("/unhealthy-pods")
+def unhealthy_pods():
+
+    pods = get_cluster_health()
+
+    return [
+        pod
+        for pod in pods
+        if not pod["healthy"]
+    ]
+
+@app.get("/namespace-summary")
+def namespace_summary():
+
+    pods = get_cluster_health()
+
+    summary = {}
+
+    for pod in pods:
+
+        ns = pod["namespace"]
+
+        if ns not in summary:
+
+            summary[ns] = {
+                "total": 0,
+                "healthy": 0,
+                "unhealthy": 0
+            }
+
+        summary[ns]["total"] += 1
+
+        if pod["healthy"]:
+            summary[ns]["healthy"] += 1
+        else:
+            summary[ns]["unhealthy"] += 1
+
+    return summary
+
+@app.get("/pod/{pod_name}")
+def pod_details(pod_name: str):
+
+    pods = get_cluster_health()
+
+    for pod in pods:
+
+        if pod["pod_name"] == pod_name:
+            return pod
+
+    return {
+        "error": "Pod not found"
+    }
 
 @app.get("/health")
 def health():
