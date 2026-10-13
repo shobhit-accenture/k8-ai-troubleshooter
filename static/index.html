@@ -1,206 +1,65 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>AKS AI Troubleshooter</title>
-
-    <style>
-
-        body{
-            font-family: Arial;
-            margin:40px;
-            background:#f5f5f5;
-        }
-
-        .card{
-            background:white;
-            padding:20px;
-            margin-bottom:20px;
-            border-radius:10px;
-            box-shadow:0 2px 6px rgba(0,0,0,.1);
-        }
-
-        button{
-            padding:10px 20px;
-            background:#0078d4;
-            color:white;
-            border:none;
-            border-radius:5px;
-            cursor:pointer;
-        }
-
-        pre{
-            white-space:pre-wrap;
-        }
-#cards{
-    display:flex;
-    gap:20px;
-    flex-wrap:wrap;
-}
-
-.metric{
-    min-width:200px;
-    background:#0078d4;
-    color:white;
-    padding:20px;
-    border-radius:10px;
-}
-
-.metric h3{
-    margin:0;
-}
-
-.metric p{
-    margin-top:10px;
-    font-size:32px;
-    font-weight:bold;
-}
-
-    </style>
-
+    style.css
 </head>
 
 <body>
 
-<h1>AKS AI Troubleshooter</h1>
-<p>AI Powered Kubernetes Health Platform</p>
+<div class="container">
 
-<div class="card">
+    <h1>AKS AI Troubleshooter</h1>
 
-    <button onclick="loadDashboard()">
-        Load Dashboard
-    </button>
-   
-    <button onclick="analyzeCluster()">
-       Analyze Cluster
-    </button>
-   
-<select id="topic">
+    <div class="cards">
 
-<option>CrashLoopBackOff</option>
-
-<option>ImagePullBackOff</option>
-
-<option>OOMKilled</option>
-
-<option>Pod</option>
-
-<option>Deployment</option>
-
-<option>Service</option>
-
-<option>Ingress</option>
-
-</select>
-
-<button onclick="teachMe()">
-Teach Me Kubernetes
-</button>
-
-</div>
-
-<div class="card">
-
-    <h2>Dashboard</h2>
-
-    <dev id="cards"></div>
-
-</div>
-
-<div class="card">
-
-    <h2>AI Output</h2>
-
-    <pre id="output"></pre>
-
-</div>
-
-<script>
-
-const BASE =
-  "https://k8-ai-troubleshooter.grayfield-fceb959e.centralindia.azurecontainerapps.io";
-
-async function loadDashboard(){
-
-    const response =
-        await fetch(
-            `${BASE}/dashboard`
-        );
-
-    const data =
-        await response.json();
-
-    document
-      .getElementById("cards")
-      .innerHTML = `
-        <div class="metric">
-            <h3>Status</h3>
-            <p>${data.overall_status}</p>
+        <div class="card">
+            <h3>Total Pods</h3>
+            <p id="totalPods">-</p>
         </div>
 
-        <div class="metric">
+        <div class="card healthy">
             <h3>Healthy Pods</h3>
-            <p>${data.healthy_pods}</p>
+            <p id="healthyPods">-</p>
         </div>
 
-        <div class="metric">
+        <div class="card unhealthy">
             <h3>Unhealthy Pods</h3>
-            <p>${data.unhealthy_pods}</p>
+            <p id="unhealthyPods">-</p>
         </div>
-      `;
-}
 
-async function analyzeCluster(){
+    </div>
 
-    const response =
-        await fetch(
-            `${BASE}/executive-summary`,
-            {
-                method:"POST"
-            }
-        );
+    <h2>Namespace Summary</h2>
 
-    const data =
-        await response.json();
+    <table id="namespaceTable">
+        <thead>
+            <tr>
+                <th>Namespace</th>
+                <th>Total</th>
+                <th>Healthy</th>
+                <th>Unhealthy</th>
+            </tr>
+        </thead>
 
-    document
-       .getElementById("output")
-       .textContent =
-       data.summary;
-}
+        <tbody></tbody>
+    </table>
 
-async function teachMe(){
+    <h2>Unhealthy Pods</h2>
 
-const topic =
-    document
-      .getElementById("topic")
-      .value;
+    <div id="issues"></div>
 
-    const response =
-        await fetch(
-            `${BASE}/teach-me`,
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({
-                    topic:"CrashLoopBackOff"
-                })
-            }
-        );
+    <h2>AI Analysis</h2>
 
-    const data =
-        await response.json();
+    <button onclick="runAnalysis()">
+        Analyze Cluster
+    </button>
 
-    document
-      .getElementById("output")
-      .textContent =
-      data.lesson;
-}
+    <pre id="analysis"></pre>
 
-</script>
+</div>
+
+app.jsscript>
 
 </body>
-
 </html>
