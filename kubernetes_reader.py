@@ -230,6 +230,8 @@ def get_cluster_health():
         healthy = (
             phase == "Running"
             and reason not in PROBLEM_REASONS
+            and reason != "Error"
+            and restart_count < 10
         )
 
         results.append(
