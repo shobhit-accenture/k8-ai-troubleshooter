@@ -220,4 +220,17 @@ def get_cluster_health():
                     .reason
                 ):
                     reason = (
-                        
+                        container_status
+                        .state
+                        .terminated
+                        .reason
+                    )
+
+                elif (
+                    container_status.state.running
+                ):
+                    reason = "Running"
+
+        healthy = (
+            phase == "Running"
+            and reason not
