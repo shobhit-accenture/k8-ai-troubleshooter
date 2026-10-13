@@ -1,0 +1,84 @@
+body{
+  margin:0;
+  background:#0f172a;
+  color:white;
+  font-family:'Segoe UI',sans-serif;
+}
+
+.container{
+  padding:30px;
+  max-width:1400px;
+  margin:auto;
+}
+
+.header h1{
+  font-size:46px;
+  margin-bottom:5px;
+}
+
+.header p{
+  color:#94a3b8;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.card{
+  background:#1e293b;
+  border-radius:20px;
+  padding:24px;
+}
+
+.cardValue{
+  font-size:42px;
+  font-weight:700;
+}
+
+.green{
+  border-left:5px solid #22c55e;
+}
+
+.red{
+  border-left:5px solid #ef4444;
+}
+
+.blue{
+  border-left:5px solid #3b82f6;
+}
+
+.namespaces{
+  display:grid;
+  grid-template-columns:
+  repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+}
+
+.namespaceCard,
+.issueCard,
+.analysisPanel{
+  background:#1e293b;
+  padding:20px;
+  border-radius:20px;
+  margin-top:20px;
+}
+
+button{
+  background:#2563eb;
+  color:white;
+  border:none;
+  padding:12px 20px;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#1d4ed8;
+}
+
+.analysisText{
+  margin-top:20px;
+  white-space:pre-wrap;
+}
