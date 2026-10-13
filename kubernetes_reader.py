@@ -1,5 +1,4 @@
 import os
-
 from kubernetes import client
 from kubernetes import config
 
@@ -29,26 +28,20 @@ def load_kubernetes_config():
 def get_cluster_health():
 
     connected = load_kubernetes_config()
-    
+
     if not connected:
 
-      return [
-        {
-            "namespace": "unknown",
-            "pod_name": "kubernetes-not-connected",
-            "phase": "Unknown",
-            "reason": connection.get(
-                "error",
-                "Kubernetes configuration unavailable"
-            ),
-            "restart_count": 0,
-            "healthy": False,
-            "authentication": connection.get(
-                "authentication",
-                "unknown"
-            )
-        }
-    ]
+        return [
+            {
+                "namespace": "unknown",
+                "pod_name": "kubernetes-not-connected",
+                "phase": "Unknown",
+                "reason": "Kubernetes configuration unavailable",
+                "restart_count": 0,
+                "healthy": False
+            }
+        ]
+
     v1 = client.CoreV1Api()
 
     pods = v1.list_pod_for_all_namespaces()
@@ -72,17 +65,13 @@ def get_cluster_health():
                     container.state.waiting
                     and container.state.waiting.reason
                 ):
-                    reason = (
-                        container.state.waiting.reason
-                    )
+                    reason = container.state.waiting.reason
 
                 elif (
                     container.state.terminated
                     and container.state.terminated.reason
                 ):
-                    reason = (
-                        container.state.terminated.reason
-                    )
+                    reason = container.state.terminated.reason
 
                 elif container.state.running:
                     reason = "Running"
