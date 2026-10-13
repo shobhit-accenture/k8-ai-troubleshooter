@@ -28,10 +28,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push
-	  uses: docker/build-push-action@v6
-	  with:
-	    context: .
-	    push: true
-	    tags: |
-	      ghcr.io/shobhit-accenture/k8-ai-troubleshooter:latest
-	      ghcr.io/shobhit-accenture/k8-ai-troubleshooter:${{ github.sha }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/shobhit-accenture/k8-ai-troubleshooter:latest
+	    ghcr.io/shobhit-accenture/k8-ai-troubleshooter:${{ github.sha }}
