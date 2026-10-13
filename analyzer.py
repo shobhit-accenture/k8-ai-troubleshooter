@@ -56,3 +56,27 @@ Provide:
             .message
             .content
     }
+
+def executive_summary(cluster_data):
+
+    unhealthy = [
+        p for p in cluster_data
+        if not p["healthy"]
+    ]
+
+    if not unhealthy:
+        return "Cluster is healthy."
+
+    return (
+        f"Cluster contains {len(unhealthy)} "
+        f"unhealthy pods requiring attention."
+    )
+
+
+def teach_kubernetes(topic):
+
+    return (
+        f"Kubernetes learning topic: {topic}. "
+        f"This endpoint can be expanded "
+        f"with AI-generated lessons."
+    )
