@@ -34,4 +34,4 @@ jobs:
           push: true
           tags: |
             ghcr.io/shobhit-accenture/k8-ai-troubleshooter:latest
-	    ghcr.io/shobhit-accenture/k8-ai-troubleshooter:${{ github.sha }}
+	        ghcr.io/shobhit-accenture/k8-ai-troubleshooter:${{ github.sha }}
