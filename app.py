@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
+from analyzer import analyze_cluster
 
 from kubernetes_reader import get_cluster_health
 from analyzer import (
@@ -50,6 +51,13 @@ def unhealthy_pods():
         for pod in pods
         if not pod["healthy"]
     ]
+
+@app.get("/analyze-cluster")
+def analyze_cluster_endpoint():
+
+    pods = get_cluster_health()
+
+    return analyze_cluster(pods)
 
 @app.get("/namespace-summary")
 def namespace_summary():
