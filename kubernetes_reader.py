@@ -30,7 +30,8 @@ def get_cluster_health():
 
     connected = load_kubernetes_config()
     
-    if not connection["connected"]:
+    if not connected:
+
       return [
         {
             "namespace": "unknown",
