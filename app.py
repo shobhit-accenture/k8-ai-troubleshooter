@@ -29,7 +29,8 @@ class TeachMeRequest(BaseModel):
 @app.get("/version")
 def version():
     return {
-        "version": "48bf859"
+        "version": "133bccb"
+	"build": "sha-test"
     }
 
 @app.get("/")
