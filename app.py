@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
 
 from kubernetes_reader import get_cluster_health
 from analyzer import (
@@ -12,6 +13,14 @@ app = FastAPI(
     version="2.0"
 )
 
+app.mount(
+    "/ui",
+    StaticFiles(
+        directory="static",
+        html=True
+    ),
+    name="ui"
+)
 
 class TeachMeRequest(BaseModel):
     topic: str

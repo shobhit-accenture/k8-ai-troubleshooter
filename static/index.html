@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>AKS AI Troubleshooter</title>
+
+    <style>
+
+        body{
+            font-family: Arial;
+            margin:40px;
+            background:#f5f5f5;
+        }
+
+        .card{
+            background:white;
+            padding:20px;
+            margin-bottom:20px;
+            border-radius:10px;
+            box-shadow:0 2px 6px rgba(0,0,0,.1);
+        }
+
+        button{
+            padding:10px 20px;
+            background:#0078d4;
+            color:white;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+        }
+
+        pre{
+            white-space:pre-wrap;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<h1>AKS AI Troubleshooter</h1>
+
+<div class="card">
+
+    <button onclick="loadDashboard()">
+        Load Dashboard
+    </button>
+
+    <button onclick="teachMe()">
+        Teach Me Kubernetes
+    </button>
+
+</div>
+
+<div class="card">
+
+    <h2>Dashboard</h2>
+
+    <pre id="dashboard"></pre>
+
+</div>
+
+<div class="card">
+
+    <h2>AI Output</h2>
+
+    <pre id="output"></pre>
+
+</div>
+
+<script>
+
+const BASE =
+  "https://k8-ai-troubleshooter.grayfield-fceb959e.centralindia.azurecontainerapps.io";
+
+async function loadDashboard(){
+
+    const response =
+        await fetch(
+            `${BASE}/dashboard`
+        );
+
+    const data =
+        await response.json();
+
+    document
+      .getElementById("dashboard")
+      .textContent =
+      JSON.stringify(
+        data,
+        null,
+        2
+      );
+}
+
+async function teachMe(){
+
+    const response =
+        await fetch(
+            `${BASE}/teach-me`,
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    topic:"CrashLoopBackOff"
+                })
+            }
+        );
+
+    const data =
+        await response.json();
+
+    document
+      .getElementById("output")
+      .textContent =
+      data.lesson;
+}
+
+</script>
+
+</body>
+
+</html>
