@@ -26,6 +26,12 @@ class TeachMeRequest(BaseModel):
     topic: str
 
 
+@app.get("/version")
+def version():
+    return {
+        "version": "48bf859"
+    }
+
 @app.get("/")
 def root():
 
