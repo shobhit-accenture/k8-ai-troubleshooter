@@ -1,44 +1,175 @@
+import base64
 import os
-from kubernetes import client
-from kubernetes import config
+import tempfile
+
+from azure.identity import DefaultAzureCredential
+from azure.mgmt.containerservice import ContainerServiceClient
+from kubernetes import client, config
+
+PROBLEM_REASONS = {
+    "CrashLoopBackOff",
+    "ImagePullBackOff",
+    "ErrImagePull",
+    "OOMKilled",
+    "CreateContainerConfigError",
+    "RunContainerError",
+    "InvalidImageName"
+}
 
 
 def load_kubernetes_config():
-    """
-    Load Kubernetes configuration.
-
-    Returns:
-        True  -> Kubernetes connection available
-        False -> Kubernetes connection unavailable
-    """
 
     try:
 
         if os.getenv("KUBERNETES_SERVICE_HOST"):
             config.load_incluster_config()
+
+            return {
+                "connected": True,
+                "authentication": "in-cluster"
+            }
+
+        subscription_id = os.getenv(
+            "AZURE_SUBSCRIPTION_ID"
+        )
+
+        resource_group = os.getenv(
+            "AKS_RESOURCE_GROUP"
+        )
+
+        cluster_name = os.getenv(
+            "AKS_CLUSTER_NAME"
+        )
+
+        if not all([
+            subscription_id,
+            resource_group,
+            cluster_name
+        ]):
+            return {
+                "connected": False,
+                "authentication": "missing-settings",
+                "error": (
+                    "Missing AKS environment variables"
+                )
+            }
+
+        credential = DefaultAzureCredential()
+
+        client_aks = ContainerServiceClient(
+            credential,
+            subscription_id
+        )
+
+        credential_result = (
+            client_aks.managed_clusters
+            .list_cluster_user_credentials(
+                resource_group,
+                cluster_name
+            )
+        )
+
+        kubeconfig_value = (
+            credential_result.kubeconfigs[0].value
+        )
+
+        if isinstance(kubeconfig_value, bytes):
+            kubeconfig_bytes = kubeconfig_value
+
+        elif isinstance(
+            kubeconfig_value,
+            bytearray
+        ):
+            kubeconfig_bytes = bytes(
+                kubeconfig_value
+            )
+
+        elif isinstance(kubeconfig_value, str):
+
+            stripped_value = (
+                kubeconfig_value.strip()
+            )
+
+            if stripped_value.startswith(
+                ("apiVersion:", "{")
+            ):
+                kubeconfig_bytes = (
+                    stripped_value.encode(
+                        "utf-8"
+                    )
+                )
+            else:
+                kubeconfig_bytes = (
+                    base64.b64decode(
+                        stripped_value
+                    )
+                )
         else:
-            config.load_kube_config()
+            return {
+                "connected": False,
+                "authentication": "managed-identity",
+                "error": (
+                    "Unsupported kubeconfig format"
+                )
+            }
 
-        return True
+        with tempfile.NamedTemporaryFile(
+            delete=False
+        ) as temp_file:
 
-    except Exception:
-        return False
+            temp_file.write(
+                kubeconfig_bytes
+            )
+
+            kubeconfig_path = (
+                temp_file.name
+            )
+
+        config.load_kube_config(
+            config_file=kubeconfig_path
+        )
+
+        return {
+            "connected": True,
+            "authentication": "managed-identity"
+        }
+
+    except Exception as error:
+
+        return {
+            "connected": False,
+            "authentication": "managed-identity",
+            "error": str(error)
+        }
 
 
 def get_cluster_health():
 
-    connected = load_kubernetes_config()
+    connection = (
+        load_kubernetes_config()
+    )
 
-    if not connected:
+    if not connection["connected"]:
 
         return [
             {
                 "namespace": "unknown",
-                "pod_name": "kubernetes-not-connected",
+                "pod_name":
+                    "kubernetes-not-connected",
                 "phase": "Unknown",
-                "reason": "Kubernetes configuration unavailable",
+                "reason": connection.get(
+                    "error",
+                    "Kubernetes "
+                    "configuration "
+                    "unavailable"
+                ),
                 "restart_count": 0,
-                "healthy": False
+                "healthy": False,
+                "authentication":
+                    connection.get(
+                        "authentication",
+                        "unknown"
+                    )
             }
         ]
 
@@ -53,49 +184,40 @@ def get_cluster_health():
         phase = pod.status.phase
 
         reason = ""
+
         restart_count = 0
 
         if pod.status.container_statuses:
 
-            for container in pod.status.container_statuses:
+            for container_status in (
+                pod.status.container_statuses
+            ):
 
-                restart_count += container.restart_count
+                restart_count += (
+                    container_status.restart_count
+                )
 
                 if (
-                    container.state.waiting
-                    and container.state.waiting.reason
+                    container_status.state.waiting
+                    and
+                    container_status.state.waiting.reason
                 ):
-                    reason = container.state.waiting.reason
+                    reason = (
+                        container_status
+                        .state
+                        .waiting
+                        .reason
+                    )
 
                 elif (
-                    container.state.terminated
-                    and container.state.terminated.reason
+                    container_status
+                    .state
+                    .terminated
+                    and
+                    container_status
+                    .state
+                    .terminated
+                    .reason
                 ):
-                    reason = container.state.terminated.reason
-
-                elif container.state.running:
-                    reason = "Running"
-
-        healthy = (
-            phase == "Running"
-            and reason not in [
-                "CrashLoopBackOff",
-                "ImagePullBackOff",
-                "ErrImagePull",
-                "OOMKilled",
-                "CreateContainerConfigError"
-            ]
-        )
-
-        results.append(
-            {
-                "namespace": pod.metadata.namespace,
-                "pod_name": pod.metadata.name,
-                "phase": phase,
-                "reason": reason,
-                "restart_count": restart_count,
-                "healthy": healthy
-            }
-        )
-
-    return results
+                    reason = (
+                        
