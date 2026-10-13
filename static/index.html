@@ -32,6 +32,29 @@
         pre{
             white-space:pre-wrap;
         }
+#cards{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.metric{
+    min-width:200px;
+    background:#0078d4;
+    color:white;
+    padding:20px;
+    border-radius:10px;
+}
+
+.metric h3{
+    margin:0;
+}
+
+.metric p{
+    margin-top:10px;
+    font-size:32px;
+    font-weight:bold;
+}
 
     </style>
 
@@ -46,7 +69,9 @@
     <button onclick="loadDashboard()">
         Load Dashboard
     </button>
-
+   <button onclick="analyzeCluster()">
+    Analyze Cluster
+</button>
     <button onclick="teachMe()">
         Teach Me Kubernetes
     </button>
@@ -57,7 +82,7 @@
 
     <h2>Dashboard</h2>
 
-    <pre id="dashboard"></pre>
+    <dev id="cards"></div>
 
 </div>
 
@@ -85,13 +110,42 @@ async function loadDashboard(){
         await response.json();
 
     document
-      .getElementById("dashboard")
-      .textContent =
-      JSON.stringify(
-        data,
-        null,
-        2
-      );
+      .getElementById("cards")
+      .innerHTML = `
+        <div class="metric">
+            <h3>Status</h3>
+            <p>${data.overall_status}</p>
+        </div>
+
+        <div class="metric">
+            <h3>Healthy Pods</h3>
+            <p>${data.healthy_pods}</p>
+        </div>
+
+        <div class="metric">
+            <h3>Unhealthy Pods</h3>
+            <p>${data.unhealthy_pods}</p>
+        </div>
+      `;
+}
+
+async function analyzeCluster(){
+
+    const response =
+        await fetch(
+            `${BASE}/executive-summary`,
+            {
+                method:"POST"
+            }
+        );
+
+    const data =
+        await response.json();
+
+    document
+       .getElementById("output")
+       .textContent =
+       data.summary;
 }
 
 async function teachMe(){
