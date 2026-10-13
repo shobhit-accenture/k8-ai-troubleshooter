@@ -63,18 +63,39 @@
 <body>
 
 <h1>AKS AI Troubleshooter</h1>
+<p>AI Powered Kubernetes Health Platform</p>
 
 <div class="card">
 
     <button onclick="loadDashboard()">
         Load Dashboard
     </button>
-   <button onclick="analyzeCluster()">
-    Analyze Cluster
-</button>
-    <button onclick="teachMe()">
-        Teach Me Kubernetes
+   
+    <button onclick="analyzeCluster()">
+       Analyze Cluster
     </button>
+   
+<select id="topic">
+
+<option>CrashLoopBackOff</option>
+
+<option>ImagePullBackOff</option>
+
+<option>OOMKilled</option>
+
+<option>Pod</option>
+
+<option>Deployment</option>
+
+<option>Service</option>
+
+<option>Ingress</option>
+
+</select>
+
+<button onclick="teachMe()">
+Teach Me Kubernetes
+</button>
 
 </div>
 
@@ -149,6 +170,11 @@ async function analyzeCluster(){
 }
 
 async function teachMe(){
+
+const topic =
+    document
+      .getElementById("topic")
+      .value;
 
     const response =
         await fetch(
