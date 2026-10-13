@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 from analyzer import analyze_cluster
+from fastapi.responses import FileResponse
 
 from kubernetes_reader import get_cluster_health
 from analyzer import (
@@ -15,12 +16,11 @@ app = FastAPI(
 )
 
 app.mount(
-    "/ui",
+    "/assets",
     StaticFiles(
-        directory="static",
-        html=True
+        directory="static/assets"
     ),
-    name="ui"
+    name="assets"
 )
 
 class TeachMeRequest(BaseModel):
@@ -33,6 +33,12 @@ def version():
         "version": "133bccb"
     }
 
+@app.get("/ui")
+def react_ui():
+    return FileResponse(
+        "static/index.html"
+    )
+    
 @app.get("/")
 def root():
 
