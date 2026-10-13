@@ -29,20 +29,25 @@ def load_kubernetes_config():
 def get_cluster_health():
 
     connected = load_kubernetes_config()
-
-    if not connected:
-
-        return [
-            {
-                "namespace": "unknown",
-                "pod_name": "kubernetes-not-connected",
-                "phase": "Unknown",
-                "reason": "Kubernetes configuration unavailable",
-                "restart_count": 0,
-                "healthy": False
-            }
-        ]
-
+    
+    if not connection["connected"]:
+      return [
+        {
+            "namespace": "unknown",
+            "pod_name": "kubernetes-not-connected",
+            "phase": "Unknown",
+            "reason": connection.get(
+                "error",
+                "Kubernetes configuration unavailable"
+            ),
+            "restart_count": 0,
+            "healthy": False,
+            "authentication": connection.get(
+                "authentication",
+                "unknown"
+            )
+        }
+    ]
     v1 = client.CoreV1Api()
 
     pods = v1.list_pod_for_all_namespaces()
