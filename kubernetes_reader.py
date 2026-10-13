@@ -6,28 +6,42 @@ from kubernetes import config
 
 def load_kubernetes_config():
     """
-    Local development:
-        uses ~/.kube/config
+    Load Kubernetes configuration.
 
-    Containerized environment:
-        uses in-cluster service account
+    Returns:
+        True  -> Kubernetes connection available
+        False -> Kubernetes connection unavailable
     """
 
     try:
+
         if os.getenv("KUBERNETES_SERVICE_HOST"):
             config.load_incluster_config()
         else:
             config.load_kube_config()
 
-    except Exception as ex:
-        raise Exception(
-            f"Unable to load Kubernetes configuration: {str(ex)}"
-        )
+        return True
+
+    except Exception:
+        return False
 
 
 def get_cluster_health():
 
-    load_kubernetes_config()
+    connected = load_kubernetes_config()
+
+    if not connected:
+
+        return [
+            {
+                "namespace": "unknown",
+                "pod_name": "kubernetes-not-connected",
+                "phase": "Unknown",
+                "reason": "Kubernetes configuration unavailable",
+                "restart_count": 0,
+                "healthy": False
+            }
+        ]
 
     v1 = client.CoreV1Api()
 
@@ -48,22 +62,23 @@ def get_cluster_health():
 
                 restart_count += container.restart_count
 
-                if container.state.waiting:
-
+                if (
+                    container.state.waiting
+                    and container.state.waiting.reason
+                ):
                     reason = (
                         container.state.waiting.reason
-                        or "Unknown"
                     )
 
-                elif container.state.terminated:
-
+                elif (
+                    container.state.terminated
+                    and container.state.terminated.reason
+                ):
                     reason = (
                         container.state.terminated.reason
-                        or "Unknown"
                     )
 
                 elif container.state.running:
-
                     reason = "Running"
 
         healthy = (
