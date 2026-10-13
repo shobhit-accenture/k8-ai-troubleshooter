@@ -30,7 +30,6 @@ class TeachMeRequest(BaseModel):
 def version():
     return {
         "version": "133bccb"
-	"build": "sha-test"
     }
 
 @app.get("/")
