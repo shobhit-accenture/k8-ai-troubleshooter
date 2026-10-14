@@ -2,17 +2,40 @@ export default function NamespaceCard({
   name,
   data
 }) {
-  return (
-    <div className="namespaceCard">
 
+  const healthy =
+    data.unhealthy === 0;
+
+  return (
+
+    <div
+      className={
+        healthy
+          ? "namespaceCard healthyNs"
+          : "namespaceCard badNs"
+      }
+    >
       <h3>{name}</h3>
 
-      <p>Total: {data.total}</p>
+      <p>
+        Total Pods:
+        {" "}
+        {data.total}
+      </p>
 
-      <p>Healthy: {data.healthy}</p>
+      <p>
+        Healthy:
+        {" "}
+        {data.healthy}
+      </p>
 
-      <p>Unhealthy: {data.unhealthy}</p>
+      <p>
+        Unhealthy:
+        {" "}
+        {data.unhealthy}
+      </p>
 
     </div>
+
   );
 }
