@@ -62,15 +62,17 @@ export default function Dashboard() {
 
     <div className="container">
 
-      <div className="header">
-        <h1>
-          🚀 AKS AI Troubleshooter
-        </h1>
+      <div className="hero">
 
-        <p>
-          AI Powered Kubernetes Health Platform
-        </p>
-      </div>
+  <h1>
+    AKS AI Troubleshooter
+  </h1>
+
+  <p>
+    AI Powered Kubernetes Health Platform
+  </p>
+
+</div>
 
       <div className="cards">
 
@@ -91,6 +93,14 @@ export default function Dashboard() {
           value={health.unhealthy_pods}
           color="red"
         />
+
+        <StatCard
+          title="Namespaces"
+          value={
+          Object.keys(namespaces).length
+          }
+          color="green"
+          />
 
       </div>
 
