@@ -1,17 +1,25 @@
 export default function StatCard({
   title,
   value,
-  color
+  icon: Icon,
+  tone = "green",
+  caption
 }) {
   return (
-    <div className={`card ${color}`}>
-      <div className="cardTitle">
-        {title}
+    <article className={`stat-card stat-${tone}`}>
+      <div className="stat-card-top">
+        <span className="stat-icon">
+          {Icon && <Icon size={22} strokeWidth={2.2} />}
+        </span>
+        <span className="status-dot" />
       </div>
 
-      <div className="cardValue">
-        {value}
-      </div>
-    </div>
+      <div className="stat-value">{value}</div>
+      <div className="stat-title">{title}</div>
+
+      {caption && (
+        <div className="stat-caption">{caption}</div>
+      )}
+    </article>
   );
 }
