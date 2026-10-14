@@ -24,25 +24,21 @@ export default function Dashboard() {
 
     setHealth(healthData.data);
 
-    const ns =
-      await axios.get(
-        "/namespace-summary"
-      );
+    const namespaceData =
+      await axios.get("/namespace-summary");
 
-    setNamespaces(ns.data);
+    setNamespaces(namespaceData.data);
 
-    const pods =
-      await axios.get(
-        "/unhealthy-pods"
-      );
+    const issueData =
+      await axios.get("/unhealthy-pods");
 
-    setIssues(pods.data);
+    setIssues(issueData.data);
   }
 
   async function runAnalysis() {
 
     setAnalysis(
-      "Running AI Analysis..."
+      "Running AI Root Cause Analysis..."
     );
 
     const result =
@@ -56,7 +52,13 @@ export default function Dashboard() {
   }
 
   if (!health)
-    return <h1>Loading...</h1>;
+    return (
+      <h2 style={{
+        padding:"40px"
+      }}>
+        Loading Kubernetes Data...
+      </h2>
+    );
 
   return (
 
@@ -64,15 +66,15 @@ export default function Dashboard() {
 
       <div className="hero">
 
-  <h1>
-    AKS AI Troubleshooter
-  </h1>
+        <h1>
+          🚀 AKS AI Troubleshooter
+        </h1>
 
-  <p>
-    AI Powered Kubernetes Health Platform
-  </p>
+        <p>
+          AI Powered Kubernetes Health Platform
+        </p>
 
-</div>
+      </div>
 
       <div className="cards">
 
@@ -97,14 +99,22 @@ export default function Dashboard() {
         <StatCard
           title="Namespaces"
           value={
-          Object.keys(namespaces).length
+            Object.keys(
+              namespaces
+            ).length
           }
           color="green"
-          />
+        />
 
       </div>
 
-      <h2>Namespaces</h2>
+      <h2
+        style={{
+          marginBottom:"20px"
+        }}
+      >
+        Namespace Health
+      </h2>
 
       <div className="namespaces">
 
@@ -112,36 +122,43 @@ export default function Dashboard() {
           Object.entries(
             namespaces
           ).map(
-            ([name,data]) =>
-              (
-                <NamespaceCard
-                  key={name}
-                  name={name}
-                  data={data}
-                />
-              )
+            ([name,data]) => (
+
+              <NamespaceCard
+                key={name}
+                name={name}
+                data={data}
+              />
+
+            )
           )
         }
 
       </div>
 
-      <h2>Unhealthy Workloads</h2>
+      <h2
+        style={{
+          marginTop:"40px",
+          marginBottom:"20px"
+        }}
+      >
+        Critical Issues
+      </h2>
 
-      <div className="issues">
+      {
+        issues.map(
+          pod => (
 
-        {
-          issues.map(
-            pod =>
-              (
-                <PodIssueCard
-                  key={pod.pod_name}
-                  pod={pod}
-                />
-              )
+            <PodIssueCard
+              key={
+                pod.pod_name
+              }
+              pod={pod}
+            />
+
           )
-        }
-
-      </div>
+        )
+      }
 
       <AIAnalysis
         analysis={analysis}
