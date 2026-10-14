@@ -1,41 +1,68 @@
+import {
+  Boxes,
+  CheckCircle2,
+  AlertTriangle
+} from "lucide-react";
+
 export default function NamespaceCard({
   name,
   data
 }) {
-
-  const healthy =
-    data.unhealthy === 0;
+  const isHealthy = data.unhealthy === 0;
+  const percentage = data.total
+    ? Math.round((data.healthy / data.total) * 100)
+    : 0;
 
   return (
-
-    <div
-      className={
-        healthy
-          ? "namespaceCard healthyNs"
-          : "namespaceCard badNs"
-      }
+    <article
+      className={`namespace-card ${
+        isHealthy ? "namespace-good" : "namespace-bad"
+      }`}
     >
-      <h3>{name}</h3>
+      <div className="namespace-card-header">
+        <div className="namespace-icon">
+          <Boxes size={21} />
+        </div>
 
-      <p>
-        Total Pods:
-        {" "}
-        {data.total}
-      </p>
+        <div>
+          <h3>{name}</h3>
+          <span>
+            {isHealthy ? "Operating normally" : "Attention required"}
+          </span>
+        </div>
 
-      <p>
-        Healthy:
-        {" "}
-        {data.healthy}
-      </p>
+        <span
+          className={`namespace-state ${
+            isHealthy ? "state-good" : "state-bad"
+          }`}
+        >
+          {isHealthy ? "Healthy" : "At risk"}
+        </span>
+      </div>
 
-      <p>
-        Unhealthy:
-        {" "}
-        {data.unhealthy}
-      </p>
+      <div className="namespace-progress">
+        <span style={{ width: `${percentage}%` }} />
+      </div>
 
-    </div>
+      <div className="namespace-metrics">
+        <div>
+          <Boxes size={16} />
+          <span>Total</span>
+          <strong>{data.total}</strong>
+        </div>
 
+        <div>
+          <CheckCircle2 size={16} />
+          <span>Healthy</span>
+          <strong>{data.healthy}</strong>
+        </div>
+
+        <div>
+          <AlertTriangle size={16} />
+          <span>Issues</span>
+          <strong>{data.unhealthy}</strong>
+        </div>
+      </div>
+    </article>
   );
 }
